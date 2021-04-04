@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Android-PeerMessanger</string>
+
+    <string name="devices">Bluetooth Devices</string>
+    <string name="bluetooth_not_support">bluetooth not supported</string>
+    <string name="bluetooth_disable">bluetooth is disabled</string>
+    <string name="bluetooth_devices_not_found">no bluetooth devices found</string>
+    <string name="bluetooth_settings">Bluetooth settings</string>
+
 </resources>
