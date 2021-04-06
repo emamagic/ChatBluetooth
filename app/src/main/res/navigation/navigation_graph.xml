@@ -3,14 +3,54 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_graph"
-    app:startDestination="@id/myFragment">
+    app:startDestination="@id/chatHistoryFragment">
+
 
 
     <fragment
-        android:id="@+id/myFragment"
-        android:name="com.emamagic.android_peermessanger.ui.devices.DevicesFragment"
-        android:label="my_fragment"
-        tools:layout="@layout/fragment_devices" />
+        android:id="@+id/chatHistoryFragment"
+        android:name="com.emamagic.android_peermessanger.ui.chatlist.ChatHistoryFragment"
+        android:label="fragment_chat_history"
+        tools:layout="@layout/fragment_chat_history" >
+
+        <action
+            android:id="@+id/action_chatHistoryFragment_to_messageListFragment"
+            app:destination="@id/messageListFragment" />
+        <action
+            android:id="@+id/action_chatHistoryFragment_to_pairedDevicesFragment"
+            app:destination="@id/pairedDevicesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.emamagic.android_peermessanger.ui.chat.ChatFragment"
+        android:label="fragment_chat"
+        tools:layout="@layout/fragment_chat" >
+        <argument android:name="deviceAddress" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/messageListFragment"
+        android:name="com.emamagic.android_peermessanger.ui.messagelist.MessageListFragment"
+        android:label="fragment_message_list"
+        tools:layout="@layout/fragment_message_list" />
+    <fragment
+        android:id="@+id/availableDevicesFragment"
+        android:name="com.emamagic.android_peermessanger.ui.availabledevices.AvailableDevicesFragment"
+        android:label="Available Devices"
+        tools:layout="@layout/fragment_available_devices" />
+    <fragment
+        android:id="@+id/pairedDevicesFragment"
+        android:name="com.emamagic.android_peermessanger.ui.pairedevices.PairedDevicesFragment"
+        android:label="Paired Devices"
+        tools:layout="@layout/fragment_paired_devices" >
+        <action
+            android:id="@+id/action_pairedDevicesFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+        <action
+            android:id="@+id/action_pairedDevicesFragment_to_availableDevicesFragment"
+            app:destination="@id/availableDevicesFragment" />
+    </fragment>
 
 
 </navigation>

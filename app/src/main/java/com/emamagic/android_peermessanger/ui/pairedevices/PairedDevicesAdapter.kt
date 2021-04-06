@@ -1,16 +1,14 @@
-package com.emamagic.android_peermessanger.ui.devices
+package com.emamagic.android_peermessanger.ui.pairedevices
 
 import android.bluetooth.BluetoothDevice
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
-import com.emamagic.android_peermessanger.R
 import com.emamagic.android_peermessanger.databinding.ItemDevicesListBinding
 
-class DevicesAdapter(private val interaction: Interaction? = null) :
+class PairedDevicesAdapter(private val interaction: Interaction? = null) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     val DIFF_CALLBACK = object : DiffUtil.ItemCallback<BluetoothDevice>() {
@@ -31,7 +29,7 @@ class DevicesAdapter(private val interaction: Interaction? = null) :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is DevicesViewHolder -> {
-                holder.bind(differ.currentList.get(position))
+                holder.bind(differ.currentList[position])
             }
         }
     }
@@ -62,7 +60,7 @@ class DevicesAdapter(private val interaction: Interaction? = null) :
         fun bind(item: BluetoothDevice){
             binding.apply {
                 txtDevicesFName.text = item.name
-                txtDevicesFId.text = item.address
+                txtDevicesFAddress.text = item.address
             }
         }
     }

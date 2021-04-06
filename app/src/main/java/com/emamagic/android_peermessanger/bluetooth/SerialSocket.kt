@@ -24,6 +24,18 @@ class SerialSocket(context: Context, device: BluetoothDevice): Runnable {
         get() = if (device.name != null) device.name else device.address
 
 
+    init {
+        if (context is Activity) throw InvalidParameterException("expected non UI context")
+        this.context = context
+        this.device = device
+        disconnectBroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (listener != null) listener?.onSerialIoError(IOException("background disconnect"))
+                disconnect() // disconnect now, else would be queued until UI re-attached
+            }
+        }
+    }
+
     @Throws(IOException::class)
     fun connect(listener: SerialListener?) {
         this.listener = listener
@@ -63,7 +75,7 @@ class SerialSocket(context: Context, device: BluetoothDevice): Runnable {
         } catch (e: Exception) {
             if (listener != null) listener?.onSerialConnectError(e)
             try {
-                socket!!.close()
+                socket?.close()
             } catch (ignored: Exception) {
             }
             socket = null
@@ -93,15 +105,4 @@ class SerialSocket(context: Context, device: BluetoothDevice): Runnable {
         private val BLUETOOTH_SPP = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
     }
 
-    init {
-        if (context is Activity) throw InvalidParameterException("expected non UI context")
-        this.context = context
-        this.device = device
-        disconnectBroadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                if (listener != null) listener?.onSerialIoError(IOException("background disconnect"))
-                disconnect() // disconnect now, else would be queued until UI re-attached
-            }
-        }
-    }
 }

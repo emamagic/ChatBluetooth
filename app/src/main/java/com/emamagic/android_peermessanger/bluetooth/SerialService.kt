@@ -22,7 +22,7 @@ class SerialService : Service(), SerialListener {
         Connect, ConnectError, Read, IoError
     }
 
-    private inner class QueueItem internal constructor(
+    private inner class QueueItem(
         var type: QueueType,
         var data: ByteArray?,
         var e: Exception?
@@ -35,19 +35,18 @@ class SerialService : Service(), SerialListener {
     private var socket: SerialSocket? = null
     private var listener: SerialListener? = null
     private var connected = false
-    override fun onDestroy() {
-        cancelNotification()
-        disconnect()
-        super.onDestroy()
-    }
+
+    init {
+        binder = SerialBinder()
+        queue1 = LinkedList()
+        queue2 = LinkedList()
+        }
 
     override fun onBind(intent: Intent): IBinder {
         return binder
     }
 
-    /**
-     * Api
-     */
+
     @Throws(IOException::class)
     fun connect(socket: SerialSocket) {
         socket.connect(this)
@@ -56,10 +55,10 @@ class SerialService : Service(), SerialListener {
     }
 
     fun disconnect() {
-        connected = false // ignore data,errors while disconnecting
+        connected = false
         cancelNotification()
         if (socket != null) {
-            socket!!.disconnect()
+            socket?.disconnect()
             socket = null
         }
     }
@@ -67,10 +66,11 @@ class SerialService : Service(), SerialListener {
     @Throws(IOException::class)
     fun write(data: ByteArray?) {
         if (!connected) throw IOException("not connected")
-        socket!!.write(data)
+        socket?.write(data)
     }
 
     fun attach(listener: SerialListener) {
+        // throw exception
         require(!(Looper.getMainLooper().thread !== Thread.currentThread())) { "not in main thread" }
         cancelNotification()
         synchronized(this) { this.listener = listener }
@@ -96,9 +96,6 @@ class SerialService : Service(), SerialListener {
 
     fun detach() {
         if (connected) createNotification()
-        // items already in event queue (posted before detach() to mainLooper) will end up in queue1
-        // items occurring later, will be moved directly to queue2
-        // detach() and mainLooper.post run in the main thread, so all items are caught
         listener = null
     }
 
@@ -137,8 +134,6 @@ class SerialService : Service(), SerialListener {
                     disconnectPendingIntent
                 )
             )
-        // @drawable/ic_notification created with Android Studio -> New -> Image Asset using @color/colorPrimaryDark as background color
-        // Android < API 21 does not support vectorDrawables in notifications, so both drawables used here, are created as .png instead of .xml
         val notification = builder.build()
         startForeground(Constants.NOTIFY_MANAGER_START_FOREGROUND_SERVICE, notification)
     }
@@ -147,9 +142,6 @@ class SerialService : Service(), SerialListener {
         stopForeground(true)
     }
 
-    /**
-     * SerialListener
-     */
     override fun onSerialConnect() {
         if (connected) {
             synchronized(this) {
@@ -230,12 +222,9 @@ class SerialService : Service(), SerialListener {
         }
     }
 
-    /**
-     * Lifecylce
-     */
-    init {
-        binder = SerialBinder()
-        queue1 = LinkedList()
-        queue2 = LinkedList()
+    override fun onDestroy() {
+        cancelNotification()
+        disconnect()
+        super.onDestroy()
     }
 }

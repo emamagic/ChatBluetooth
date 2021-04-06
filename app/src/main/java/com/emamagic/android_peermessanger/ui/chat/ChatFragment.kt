@@ -13,10 +13,12 @@ import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.navigation.fragment.navArgs
 import com.emamagic.android_peermessanger.R
 import com.emamagic.android_peermessanger.base.BaseFragment
 import com.emamagic.android_peermessanger.bluetooth.SerialListener
@@ -27,8 +29,9 @@ import com.emamagic.android_peermessanger.util.TextUtil
 
 class ChatFragment : BaseFragment<FragmentChatBinding>(), ServiceConnection, SerialListener {
 
+    private val args: ChatFragmentArgs by navArgs()
+
     private var service: SerialService? = null
-    private val deviceAddress: String? = null
     private var connected = Connected.False
     private var initialStart = true
     private val newline = TextUtil.newline_crlf
@@ -39,14 +42,14 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(), ServiceConnection, Ser
         container: ViewGroup?
     ) = FragmentChatBinding.inflate(inflater, container, false)
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // get argument
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding?.apply {
+            imgChatFSend.setOnClickListener {
+                send(edtChatFSend.text.toString())
+            }
+        }
 
 
     }
@@ -54,8 +57,8 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(), ServiceConnection, Ser
     private fun connect() {
         try {
             val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-            val device: BluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress)
-            //  status("connecting...")
+            val device: BluetoothDevice = bluetoothAdapter.getRemoteDevice(args.deviceAddress)
+            Log.e("TAG", "connecting ...")
             connected = Connected.Pending
             val socket = SerialSocket(requireActivity().applicationContext, device)
             service?.connect(socket)
@@ -95,9 +98,7 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(), ServiceConnection, Ser
     private fun receive(data: ByteArray) {
         var msg = String(data)
         if (newline == TextUtil.newline_crlf && msg.isNotEmpty()) {
-            // don't show CR as ^M if directly before LF
             msg = msg.replace(TextUtil.newline_crlf, TextUtil.newline_lf)
-            // special handling if CR and LF come in separate fragments
             if (pendingNewline && msg[0] == '\n') {
                 val edt: Editable? = binding?.txtChatFReceive?.editableText
                 if (edt != null && edt.length > 1) edt.replace(edt.length - 2, edt.length, "")
@@ -122,18 +123,22 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(), ServiceConnection, Ser
     }
 
     override fun onSerialConnect() {
+        Log.e("TAG", "connected ...")
         connected = Connected.True
     }
 
     override fun onSerialConnectError(e: Exception?) {
+        Log.e("TAG", "disconnected ... Exception -> ${e?.message}")
         disconnect()
     }
 
     override fun onSerialRead(data: ByteArray?) {
+        Log.e("TAG", "receive message -> $data")
         receive(data!!)
     }
 
     override fun onSerialIoError(e: Exception?) {
+        Log.e("TAG", "disconnected ... Exception -> ${e?.message}")
         disconnect()
     }
 
@@ -150,7 +155,7 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(), ServiceConnection, Ser
                 activity,
                 SerialService::class.java
             )
-        ) // prevents service destroy on unbind from recreated activity caused by orientation change
+        )
     }
 
     override fun onStop() {

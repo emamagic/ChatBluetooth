@@ -3,4 +3,7 @@
     <item
         android:id="@+id/btn_settings"
         android:title="@string/bluetooth_settings" />
+    <item
+        android:id="@+id/btn_available_devices"
+        android:title="@string/scan_available_devices" />
 </menu>
