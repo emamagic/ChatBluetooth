@@ -10,7 +10,7 @@
     <fragment
         android:id="@+id/chatHistoryFragment"
         android:name="com.emamagic.android_peermessanger.ui.chatlist.ChatHistoryFragment"
-        android:label="fragment_chat_history"
+        android:label="Chat History"
         tools:layout="@layout/fragment_chat_history" >
 
         <action
@@ -23,7 +23,7 @@
     <fragment
         android:id="@+id/chatFragment"
         android:name="com.emamagic.android_peermessanger.ui.chat.ChatFragment"
-        android:label="fragment_chat"
+        android:label="Chat"
         tools:layout="@layout/fragment_chat" >
         <argument android:name="deviceAddress" />
     </fragment>
@@ -32,7 +32,7 @@
     <fragment
         android:id="@+id/messageListFragment"
         android:name="com.emamagic.android_peermessanger.ui.messagelist.MessageListFragment"
-        android:label="fragment_message_list"
+        android:label="Message List"
         tools:layout="@layout/fragment_message_list" />
     <fragment
         android:id="@+id/availableDevicesFragment"

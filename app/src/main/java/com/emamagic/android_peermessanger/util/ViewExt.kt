@@ -74,5 +74,48 @@ fun Fragment.toasty(@StringRes titleId: Int, selectedMode: Int? = null) {
     }
 }
 
+fun Fragment.toasty(text: String, selectedMode: Int? = null) {
+    val layout = layoutInflater.inflate(
+        R.layout.toast_layout,
+        requireView().findViewById(R.id.toast_root)
+    )
+    when (selectedMode) {
+
+        MODE_TOAST_SUCCESS -> {
+            layout.findViewById<ImageView>(R.id.toast_img)
+                .setImageResource(R.drawable.ic_corroct_toast)
+            layout.findViewById<ConstraintLayout>(R.id.toast_root)
+                .setBackgroundResource(R.drawable.bg_corroct_toast)
+        }
+        MODE_TOAST_WARNING -> {
+            layout.findViewById<ImageView>(R.id.toast_img)
+                .setImageResource(R.drawable.ic_warning_toast)
+            layout.findViewById<ConstraintLayout>(R.id.toast_root)
+                .setBackgroundResource(R.drawable.bg_warning_toast)
+            layout.findViewById<TextView>(R.id.toast_txt)
+                .setTextColor(resources.getColor(R.color.black))
+        }
+        MODE_TOAST_ERROR -> {
+            layout.findViewById<ImageView>(R.id.toast_img)
+                .setImageResource(R.drawable.ic_error_toast)
+            layout.findViewById<ConstraintLayout>(R.id.toast_root)
+                .setBackgroundResource(R.drawable.bg_error_toast)
+        }
+        else -> {
+            Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
+        }
+
+    }
+
+    layout.findViewById<TextView>(R.id.toast_txt).text = text
+    if (selectedMode != null) {
+        Toast(requireActivity()).apply {
+            setGravity(Gravity.BOTTOM, 0, 100)
+            duration = Toast.LENGTH_LONG
+            view = layout
+        }.show()
+    }
+}
+
 val <T> T.exhaustive: T
     get() = this

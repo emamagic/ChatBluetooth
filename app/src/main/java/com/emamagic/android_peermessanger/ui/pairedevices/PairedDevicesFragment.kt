@@ -103,8 +103,8 @@ class PairedDevicesFragment: BaseFragment<FragmentPairedDevicesBinding>() ,Paire
     }
 
     override fun onItemSelected(position: Int) {
-        val navigation = PairedDevicesFragmentDirections.actionPairedDevicesFragmentToChatFragment(listItems?.get(position)?.address!!)
-        findNavController().navigate(navigation)
+        val navigateToChatFragment = PairedDevicesFragmentDirections.actionPairedDevicesFragmentToChatFragment(listItems?.get(position)?.address!!)
+        findNavController().navigate(navigateToChatFragment)
     }
 
     private fun getPermission() {
