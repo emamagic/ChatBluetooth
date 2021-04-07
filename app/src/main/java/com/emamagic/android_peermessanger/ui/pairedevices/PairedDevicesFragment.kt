@@ -1,11 +1,13 @@
 package com.emamagic.android_peermessanger.ui.pairedevices
 
 import android.Manifest
+import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
 import android.view.*
@@ -68,10 +70,11 @@ class PairedDevicesFragment: BaseFragment<FragmentPairedDevicesBinding>() ,Paire
             }
             R.id.btn_available_devices -> {
                 if (hasPermissions(requireContext() ,*permissions)) {
-                    val navigation = PairedDevicesFragmentDirections.actionPairedDevicesFragmentToAvailableDevicesFragment()
-                    findNavController().navigate(navigation)
-                }else { getPermission() }
-
+                    if (isLocationGranted()){
+                        val navigation = PairedDevicesFragmentDirections.actionPairedDevicesFragmentToAvailableDevicesFragment()
+                        findNavController().navigate(navigation)
+                    } else getLocation()
+                } else  getPermission()
                 return true
             }
             else -> {
@@ -116,6 +119,26 @@ class PairedDevicesFragment: BaseFragment<FragmentPairedDevicesBinding>() ,Paire
 
     private fun hasPermissions(context: Context, vararg permissions: String): Boolean = permissions.all {
         ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun isLocationGranted(): Boolean {
+        val manager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+        if (!manager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)) return false
+        return true
+    }
+
+    private fun getLocation() {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
+        builder.setMessage("برای اتصال به دستگاه باید GPS خود را فعال کنید")
+            .setCancelable(false)
+            .setPositiveButton("باشه"
+            ) { _, _ ->
+                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }
+            .setNegativeButton("بیخیال"
+            ) { dialog, _ -> dialog.cancel() }
+        val alert: AlertDialog = builder.create()
+        alert.show()
     }
 
 }
