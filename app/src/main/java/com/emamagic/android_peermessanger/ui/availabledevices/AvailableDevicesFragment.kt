@@ -115,7 +115,6 @@ class AvailableDevicesFragment : BaseFragment<FragmentAvailableDevicesBinding>()
     }
 
     override fun onItemSelected(position: Int) {
-        binding?.progressDevices?.visibility = View.VISIBLE
         pairDevice(listItems?.get(position)!!)
     }
 }
